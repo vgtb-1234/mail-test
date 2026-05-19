@@ -1579,4 +1579,42 @@ if(curLeader){
 }
 </script>
 </body>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+// 🔥 1. 貼上你剛剛 SDK
+const firebaseConfig = {
+  apiKey: "貼這裡",
+  authDomain: "貼這裡",
+  databaseURL: "貼這裡",
+  projectId: "貼這裡",
+};
+
+// 🔥 2. 初始化 Firebase
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// 🔥 3. 同步資料位置（像資料夾）
+const docRef = ref(db, "docs/demo");
+
+// 🔥 4. 抓 textarea
+const editor = document.getElementById("editor");
+
+// 🔥 5. 別人改 → 你更新
+onValue(docRef, (snapshot) => {
+  const data = snapshot.val();
+  if (data && data.text !== editor.value) {
+    editor.value = data.text;
+  }
+});
+
+// 🔥 6. 你打字 → 存進 Firebase
+editor.addEventListener("input", () => {
+  set(docRef, {
+    text: editor.value,
+    updatedAt: Date.now()
+  });
+});
+</script>
 </html>
