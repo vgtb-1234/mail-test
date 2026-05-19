@@ -1401,7 +1401,75 @@ function downloadExcel(filename, sheets){
       html += `<tr>${row.map(c=>`<td style="border:1px solid #2a2f45;background:${bg};color:#e8eaf0;">${c==null?'':c}</td>`).join('')}</tr>`;
     });
     html += `</table><br>`;
+  });<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  onSnapshot
+} from "https://www.gstatic.com/firebasejs/12.0.0/firebase-firestore.js";
+
+
+// Firebase 設定
+const firebaseConfig = {
+  apiKey: "AIzaSyD7BIcKf4I6afWxcS5gujW445OdMKw8D0s",
+  authDomain: "letter-registration.firebaseapp.com",
+  projectId: "letter-registration",
+  storageBucket: "letter-registration.firebasestorage.app",
+  messagingSenderId: "765120117173",
+  appId: "1:765120117173:web:55f286da6fc15eced341fc",
+  measurementId: "G-348WQHQWE1"
+};
+
+
+// 初始化 Firebase
+const app = initializeApp(firebaseConfig);
+
+const db = getFirestore(app);
+
+
+// 找頁面上第一個 textarea
+const editor = document.querySelector("textarea");
+
+
+// 如果沒找到 textarea 就停止
+if (!editor) {
+
+  console.log("找不到 textarea");
+
+} else {
+
+  // Firebase 文件位置
+  const docRef = doc(db, "shared", "editor");
+
+
+  // 即時同步
+  onSnapshot(docRef, (docSnap) => {
+
+    if (docSnap.exists()) {
+
+      editor.value = docSnap.data().text || "";
+
+    }
+
   });
+
+
+  // 輸入時更新 Firebase
+  editor.addEventListener("input", async () => {
+
+    await setDoc(docRef, {
+      text: editor.value
+    });
+
+  });
+
+}
+
+</script>
   html += `</body></html>`;
   const blob = new Blob(['\uFEFF'+html],{type:'application/vnd.ms-excel;charset=utf-8'});
   const a = document.createElement('a');
